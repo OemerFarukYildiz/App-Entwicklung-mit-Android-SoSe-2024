@@ -10,4 +10,12 @@
     <string name="logout">Logout</string>
     <string name="back_description" />
     <string name="cart_description" />
+    <string name="fr_chte">Früchte</string>
+    <string name="s_igkeiten">Süßigkeiten</string>
+    <string name="brot">Brot</string>
+    <string name="kaufen">Kaufen</string>
+    <string name="zur_ck">Zurück</string>
+    <string name="zurueck">Zurück</string>
+    <string name="kein_produkt_im_warenkorb">Kein Produkt im Warenkorb</string>
+    <string name="zur_kaufabwicklung">Zur Kaufabwicklung</string>
 </resources>

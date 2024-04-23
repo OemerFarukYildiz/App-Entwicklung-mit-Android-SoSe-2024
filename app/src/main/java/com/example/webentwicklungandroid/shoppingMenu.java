@@ -56,6 +56,8 @@ public class shoppingMenu extends AppCompatActivity {
                 // Startet die Brot-Seite
                 Intent intent = new Intent(shoppingMenu.this, brot.class);
                 startActivity(intent);
+
+
             }
         });
 

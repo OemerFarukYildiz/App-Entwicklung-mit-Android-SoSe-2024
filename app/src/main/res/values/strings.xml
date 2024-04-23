@@ -8,4 +8,6 @@
     <string name="click_to_login">Click to login</string>
     <string name="click_to_register">Click to register</string>
     <string name="logout">Logout</string>
+    <string name="back_description" />
+    <string name="cart_description" />
 </resources>

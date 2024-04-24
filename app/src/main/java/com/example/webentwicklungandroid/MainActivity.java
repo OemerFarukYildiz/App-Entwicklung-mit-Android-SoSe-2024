@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         bestellHistorieButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getApplicationContext(), bestellHistorie.class);
+            Intent intent = new Intent(getApplicationContext(), bestellhistorie.class);
             startActivity(intent);
         });
     }

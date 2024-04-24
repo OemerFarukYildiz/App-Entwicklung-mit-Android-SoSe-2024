@@ -30,7 +30,7 @@
             android:name=".warenkorb"
             android:exported="false" />
         <activity
-            android:name=".bestellHistorie"
+            android:name=".bestellhistorie"
             android:exported="false" />
         <activity
             android:name=".shoppingMenu"

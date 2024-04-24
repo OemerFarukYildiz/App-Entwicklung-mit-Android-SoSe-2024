@@ -28,7 +28,6 @@ public class brot extends AppCompatActivity {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
 
-        // Verwende die neue URL für die Datenbankreferenz
         databaseReference = FirebaseDatabase.getInstance("https://login-register-7710b-default-rtdb.europe-west1.firebasedatabase.app/").getReference();
 
         backButton = findViewById(R.id.back_to_main_button);
@@ -48,7 +47,7 @@ public class brot extends AppCompatActivity {
     private void setupItemButton(Button button, String productName) {
         button.setOnClickListener(v -> {
             if (currentUser != null) {
-                addItemToCart(currentUser.getUid(), productName);
+                addItemToCart(currentUser.getUid(), productName, 1);
             } else {
                 Log.e("Firebase", "Kein Benutzer angemeldet");
                 startActivity(new Intent(this, login.class));
@@ -62,12 +61,16 @@ public class brot extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void addItemToCart(String userId, String productName) {
-        DatabaseReference cartRef = databaseReference.child("users").child(userId).child("cart");
-        cartRef.push().setValue(productName).addOnCompleteListener(task -> {
+    private void addItemToCart(String userId, String productName, int quantity) {
+        DatabaseReference cartRef = databaseReference.child("users").child(userId).child("cart").child(productName);
+        cartRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Log.d("Firebase", "Produkt erfolgreich hinzugefügt: " + productName);
-                navigateToCart();
+                Integer existingQuantity = task.getResult().getValue(Integer.class);
+                if (existingQuantity != null) {
+                    cartRef.setValue(existingQuantity + quantity);
+                } else {
+                    cartRef.setValue(quantity);
+                }
             } else {
                 Log.e("Firebase", "Fehler beim Hinzufügen des Produkts", task.getException());
             }

@@ -1,10 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".suessigkeiten">
+    android:padding="16dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Zurück Button oben links -->
+    <Button
+        android:id="@+id/back_to_main_button_sweets"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Zurück"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="150dp"/>
+
+    <!-- LinearLayout für Süßigkeiten -->
+    <LinearLayout
+        android:id="@+id/sweets_list_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/back_to_main_button_sweets"
+        android:orientation="vertical"
+        android:layout_above="@+id/to_cart_button_sweets">
+
+        <!-- Einzelne Süßigkeit mit Kaufen-Button -->
+        <!-- Chips -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Chips"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kaufen"
+                android:id="@+id/buy_chips_button"/>
+        </LinearLayout>
+
+        <!-- Lakritze -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Lakritze"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kaufen"
+                android:id="@+id/buy_lakritze_button"/>
+        </LinearLayout>
+
+        <!-- Muffins -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Muffins"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kaufen"
+                android:id="@+id/buy_muffins_button"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Button zum Warenkorb unten rechts -->
+    <Button
+        android:id="@+id/to_cart_button_sweets"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Warenkorb"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"/>
+
+</RelativeLayout>

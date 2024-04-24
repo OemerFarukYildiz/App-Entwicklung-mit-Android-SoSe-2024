@@ -3,27 +3,24 @@ package com.example.webentwicklungandroid;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class warenkorb extends AppCompatActivity {
 
@@ -41,6 +38,7 @@ public class warenkorb extends AppCompatActivity {
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
+        // Hier setzen Sie den spezifischen Link zu Ihrer Firebase-Datenbank ein
         databaseReference = FirebaseDatabase.getInstance("https://login-register-7710b-default-rtdb.europe-west1.firebasedatabase.app/").getReference();
 
         cartList = findViewById(R.id.cart_list);
@@ -52,7 +50,7 @@ public class warenkorb extends AppCompatActivity {
         cartList.setAdapter(adapter);
 
         backButton.setOnClickListener(v -> finish());
-        checkoutButton.setOnClickListener(v -> startActivity(new Intent(this, checkout.class)));
+        checkoutButton.setOnClickListener(v -> checkoutCart());
 
         if (currentUser != null) {
             loadCartItems();
@@ -86,80 +84,36 @@ public class warenkorb extends AppCompatActivity {
         });
     }
 
-    private class CartItemAdapter extends ArrayAdapter<CartItem> {
-        CartItemAdapter(AppCompatActivity context, ArrayList<CartItem> cartItems) {
-            super(context, 0, cartItems);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_warenkorb, parent, false);
-            }
-            TextView itemName = convertView.findViewById(R.id.item_name);
-            TextView quantityText = convertView.findViewById(R.id.quantity_text);
-            Button subtractButton = convertView.findViewById(R.id.button_decrease);
-            Button addButton = convertView.findViewById(R.id.button_increase);
-
-            CartItem currentItem = getItem(position);
-            itemName.setText(currentItem.getName());
-            quantityText.setText(String.valueOf(currentItem.getQuantity()));
-
-            subtractButton.setOnClickListener(v -> {
-                int currentQuantity = currentItem.getQuantity();
-                if (currentQuantity > 1) {
-                    currentItem.setQuantity(currentQuantity - 1);
-                    updateItemInDatabase(currentItem);
-                } else {
-                    removeFromDatabase(currentItem.getName());
+    private void checkoutCart() {
+        DatabaseReference userCartRef = databaseReference.child("users").child(currentUser.getUid()).child("cart");
+        userCartRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                HashMap<String, Integer> orderDetails = new HashMap<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String product = snapshot.getKey();
+                    Integer quantity = snapshot.getValue(Integer.class);
+                    orderDetails.put(product, quantity);
                 }
-            });
 
-            addButton.setOnClickListener(v -> {
-                int currentQuantity = currentItem.getQuantity();
-                currentItem.setQuantity(currentQuantity + 1);
-                updateItemInDatabase(currentItem);
-            });
+                if (!orderDetails.isEmpty()) {
+                    databaseReference.child("orders").child(currentUser.getUid()).push().setValue(orderDetails)
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(warenkorb.this, "Kauf war erfolgreich!", Toast.LENGTH_LONG).show();
+                                userCartRef.removeValue();
+                                adapter.clear();
+                                adapter.notifyDataSetChanged();
+                                emptyCartMessage.setVisibility(View.VISIBLE);
+                            })
+                            .addOnFailureListener(e -> Log.e("Firebase", "Fehler beim Speichern der Bestellung", e));
+                }
+            }
 
-            return convertView;
-        }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Firebase", "Daten lesen fehlgeschlagen: " + databaseError.getMessage(), databaseError.toException());
 
-        private void updateItemInDatabase(CartItem cartItem) {
-            databaseReference.child("users").child(currentUser.getUid()).child("cart")
-                    .child(cartItem.getName()).setValue(cartItem.getQuantity());
-        }
-
-        private void removeFromDatabase(String itemName) {
-            databaseReference.child("users").child(currentUser.getUid()).child("cart")
-                    .child(itemName).removeValue();
-        }
-    }
-
-    // Repräsentiert ein Item im Warenkorb
-    public static class CartItem {
-        private String name;
-        private int quantity;
-
-        public CartItem(String name, int quantity) {
-            this.name = name;
-            this.quantity = quantity;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public int getQuantity() {
-            return quantity;
-        }
-
-        public void setQuantity(int quantity) {
-            this.quantity = quantity;
-        }
+            }
+        });
     }
 }

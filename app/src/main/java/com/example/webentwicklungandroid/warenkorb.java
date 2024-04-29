@@ -24,6 +24,7 @@ import java.util.HashMap;
 
 public class warenkorb extends AppCompatActivity {
 
+    // Deklaration der UI-Komponenten und Firebase Referenzen
     private ListView cartList;
     private Button backButton, checkoutButton;
     private TextView emptyCartMessage;
@@ -36,30 +37,40 @@ public class warenkorb extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_warenkorb);
 
+        // Firebase Authentifizierung und Benutzerzuweisung
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
-        // Hier setzen Sie den spezifischen Link zu Ihrer Firebase-Datenbank ein
+
+        // Initialisierung der Datenbankreferenz
         databaseReference = FirebaseDatabase.getInstance("https://login-register-7710b-default-rtdb.europe-west1.firebasedatabase.app/").getReference();
 
+        // Zuordnung der UI-Komponenten aus dem Layout
         cartList = findViewById(R.id.cart_list);
         backButton = findViewById(R.id.back_button);
         checkoutButton = findViewById(R.id.checkout_button);
         emptyCartMessage = findViewById(R.id.empty_cart_message);
 
+        // Initialisierung und Zuweisung des Adapters für das ListView
         adapter = new CartItemAdapter(this, new ArrayList<>());
         cartList.setAdapter(adapter);
 
+        // Listener für den Zurück-Button
         backButton.setOnClickListener(v -> finish());
+
+        // Listener für den Checkout-Button
         checkoutButton.setOnClickListener(v -> checkoutCart());
 
+        // Lädt die Warenkorb-Items, wenn ein Benutzer angemeldet ist
         if (currentUser != null) {
             loadCartItems();
         } else {
+            // Leitet zum Login um, wenn kein Benutzer angemeldet ist
             startActivity(new Intent(this, login.class));
             finish();
         }
     }
 
+    // Lädt Warenkorb-Items aus Firebase
     private void loadCartItems() {
         DatabaseReference cartRef = databaseReference.child("users").child(currentUser.getUid()).child("cart");
         cartRef.addValueEventListener(new ValueEventListener() {
@@ -84,6 +95,7 @@ public class warenkorb extends AppCompatActivity {
         });
     }
 
+    // Führt den Checkout-Vorgang aus
     private void checkoutCart() {
         DatabaseReference userCartRef = databaseReference.child("users").child(currentUser.getUid()).child("cart");
         userCartRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -96,6 +108,7 @@ public class warenkorb extends AppCompatActivity {
                     orderDetails.put(product, quantity);
                 }
 
+                // Speichert Bestelldetails und bereinigt den Warenkorb nach erfolgreichem Kauf
                 if (!orderDetails.isEmpty()) {
                     databaseReference.child("orders").child(currentUser.getUid()).push().setValue(orderDetails)
                             .addOnSuccessListener(aVoid -> {
@@ -112,7 +125,6 @@ public class warenkorb extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.e("Firebase", "Daten lesen fehlgeschlagen: " + databaseError.getMessage(), databaseError.toException());
-
             }
         });
     }

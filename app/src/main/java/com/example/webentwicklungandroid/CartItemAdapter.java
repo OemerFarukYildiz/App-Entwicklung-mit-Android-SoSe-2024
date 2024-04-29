@@ -1,13 +1,4 @@
 package com.example.webentwicklungandroid;
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.TextView;
-import androidx.annotation.NonNull;
-
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -17,12 +8,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
-import java.util.ArrayList;
 
 import java.util.ArrayList;
 
+// Adapter-Klasse für CartItem, erweitert ArrayAdapter, um CartItem-Objekte in einer ListView anzuzeigen
 public class CartItemAdapter extends ArrayAdapter<CartItem> {
-    // Konstruktor des Adapters
+    // Konstruktor des Adapters, der den Kontext, das Layout und die Liste der CartItems erhält
     public CartItemAdapter(Context context, ArrayList<CartItem> items) {
         super(context, R.layout.list_item_warenkorb, items);
     }
@@ -31,10 +22,10 @@ public class CartItemAdapter extends ArrayAdapter<CartItem> {
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        // ViewHolder Pattern für bessere Performance
+        // ViewHolder Pattern für bessere Performance in Listenansichten
         ViewHolder holder;
 
-        // Überprüfung, ob ein bestehendes View wiederverwendet werden kann, sonst inflating des Views
+        // Überprüfung, ob ein bestehendes View wiederverwendet werden kann, sonst Inflation des Views
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_warenkorb, parent, false);
             holder = new ViewHolder();
@@ -47,32 +38,32 @@ public class CartItemAdapter extends ArrayAdapter<CartItem> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        // Holen des aktuellen Items basierend auf der Position
+        // Holen des aktuellen CartItem-Objekts basierend auf der Position
         CartItem currentItem = getItem(position);
 
-        // Setzen des Item-Namens und der Menge
+        // Setzen des Namen und der Menge des CartItem-Objekts auf die TextViews
         holder.itemName.setText(currentItem.getName());
         holder.quantityText.setText(String.valueOf(currentItem.getQuantity()));
 
-        // Setzen der Button-Logiken zum Erhöhen und Verringern der Menge
+        // Setzen der OnClickListener für die "Verringern" und "Erhöhen" Buttons
         holder.decreaseButton.setOnClickListener(v -> {
             int currentQuantity = currentItem.getQuantity();
-            if (currentQuantity > 1) {
+            if (currentQuantity > 1) { // Menge verringern, wenn sie größer als 1 ist
                 currentItem.setQuantity(currentQuantity - 1);
-                notifyDataSetChanged();
+                notifyDataSetChanged(); // Benachrichtigt den Adapter über die Änderung
             }
         });
 
         holder.increaseButton.setOnClickListener(v -> {
             int currentQuantity = currentItem.getQuantity();
-            currentItem.setQuantity(currentQuantity + 1);
-            notifyDataSetChanged();
+            currentItem.setQuantity(currentQuantity + 1); // Menge erhöhen
+            notifyDataSetChanged(); // Benachrichtigt den Adapter über die Änderung
         });
 
-        return convertView;
+        return convertView; // Rückgabe der fertigen Ansicht
     }
 
-    // ViewHolder Klasse für besseres Caching der Views
+    // ViewHolder Klasse hilft bei der besseren Performance durch das Caching der View-Elemente
     private static class ViewHolder {
         TextView itemName;
         TextView quantityText;

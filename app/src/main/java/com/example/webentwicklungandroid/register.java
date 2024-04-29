@@ -1,114 +1,98 @@
 package com.example.webentwicklungandroid;
 
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class register extends AppCompatActivity {
+    // UI-Komponenten
+    private TextInputEditText editTextEmail, editTextPassword;
+    private Button buttonReg;
+    private ProgressBar progressBar;
+    private TextView loginNowTextView;
 
-    TextInputEditText editTextEmail, editTextPassword;
-    Button buttonReg;
+    // Firebase Authentifizierung
+    private FirebaseAuth mAuth;
 
-    FirebaseAuth mAuth;
-
-    ProgressBar progressBar;
-
-    TextView textView;
-
+    // Überprüft beim Start der Activity, ob der Benutzer bereits angemeldet ist
     @Override
     public void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-            finish();
+        if (mAuth.getCurrentUser() != null) {
+            navigateToMainActivity();  // Direktnavigation zur MainActivity, falls bereits angemeldet
         }
     }
 
+    // Initialisierung der Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        mAuth= FirebaseAuth.getInstance();
+
+        mAuth = FirebaseAuth.getInstance();  // Instanz von FirebaseAuth initialisieren
+        initView();  // Initialisiert die UI-Komponenten
+    }
+
+    // Initialisiert die UI-Komponenten und setzt Event Listener
+    private void initView() {
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.Password);
         buttonReg = findViewById(R.id.btn_register);
         progressBar = findViewById(R.id.progressBar);
-        textView = findViewById(R.id.loginNow);
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), login.class);
-                startActivity(intent);
-                finish();
+        loginNowTextView = findViewById(R.id.loginNow);
 
-            }
-        });
+        // Listener für die Navigation zurück zur Login-Seite
+        loginNowTextView.setOnClickListener(view -> navigateToLogin());
 
-        buttonReg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                progressBar.setVisibility(View.VISIBLE);
-                String email, Password;
-                email = String.valueOf(editTextEmail.getText());
-                Password = String.valueOf(editTextPassword.getText());
-
-                if (TextUtils.isEmpty(email)){
-                    Toast.makeText(register.this, "Enter Email", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (TextUtils.isEmpty(Password)){
-                    Toast.makeText(register.this, "Enter password",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                mAuth.createUserWithEmailAndPassword(email, Password)
-                        .addOnCompleteListener( new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                progressBar.setVisibility((View.GONE));
-                                if (task.isSuccessful()) {
-
-                                    Toast.makeText(register.this, "Account created",
-                                            Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(getApplicationContext(), login.class);
-                                    startActivity(intent);
-                                    finish();
-
-                                } else {
-                                    // If sign in fails, display a message to the user.
-
-                                    Toast.makeText(register.this, "Try again.",
-                                            Toast.LENGTH_SHORT).show();
-
-                                }
-                            }
-                        });
-            }
-        });
-
-        }
-
+        // Listener für den Registrierungsprozess
+        buttonReg.setOnClickListener(view -> attemptRegister());
     }
 
+    // Führt den Registrierungsvorgang aus
+    private void attemptRegister() {
+        String email = editTextEmail.getText().toString().trim(); // E-Mail aus dem Eingabefeld holen
+        String password = editTextPassword.getText().toString().trim(); // Passwort aus dem Eingabefeld holen
+
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Email and password are required.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        progressBar.setVisibility(View.VISIBLE); // Zeigt die Fortschrittsanzeige
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    progressBar.setVisibility(View.GONE); // Verbirgt die Fortschrittsanzeige
+                    if (task.isSuccessful()) {
+                        Toast.makeText(register.this, "Account created successfully", Toast.LENGTH_SHORT).show();
+                        navigateToLogin(); // Navigation zur Login-Seite nach erfolgreicher Registrierung
+                    } else {
+                        Toast.makeText(register.this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show(); // Fehlermeldung bei Fehlschlag
+                    }
+                });
+    }
+
+    // Navigiert zur Hauptaktivität
+    private void navigateToMainActivity() {
+        startActivity(new Intent(this, MainActivity.class));
+        finish(); // Beendet die aktuelle Activity
+    }
+
+    // Navigiert zur Login-Seite
+    private void navigateToLogin() {
+        startActivity(new Intent(this, login.class));
+        finish(); // Beendet die aktuelle Activity
+    }
+}

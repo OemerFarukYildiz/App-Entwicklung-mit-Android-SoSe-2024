@@ -42,7 +42,7 @@ public class warenkorb extends AppCompatActivity {
         currentUser = mAuth.getCurrentUser();
 
         // Initialisierung der Datenbankreferenz
-        databaseReference = FirebaseDatabase.getInstance("https://login-register-7710b-default-rtdb.europe-west1.firebasedatabase.app/").getReference();
+        databaseReference = FirebaseDatabase.getInstance("https://login-register-7710b-default-rtdb.europe-west1.firebasedatabase.app/").getReference();   // hat ohne Firebase Link nicht funktioniert
 
         // Zuordnung der UI-Komponenten aus dem Layout
         cartList = findViewById(R.id.cart_list);

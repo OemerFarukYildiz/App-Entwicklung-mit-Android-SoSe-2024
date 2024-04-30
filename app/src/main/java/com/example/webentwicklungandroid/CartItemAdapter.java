@@ -9,20 +9,27 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 
 // Adapter-Klasse für CartItem, erweitert ArrayAdapter, um CartItem-Objekte in einer ListView anzuzeigen
 public class CartItemAdapter extends ArrayAdapter<CartItem> {
+    private DatabaseReference databaseReference; // Referenz für Firebase-Datenbank
+
     // Konstruktor des Adapters, der den Kontext, das Layout und die Liste der CartItems erhält
     public CartItemAdapter(Context context, ArrayList<CartItem> items) {
         super(context, R.layout.list_item_warenkorb, items);
+        // Initialisiert die Firebase-Datenbankreferenz mit dem spezifischen Link
+        databaseReference = FirebaseDatabase.getInstance("https://login-register-7710b-default-rtdb.europe-west1.firebasedatabase.app/").getReference();
     }
 
     // Diese Methode wird aufgerufen, um jede Zeile in der ListView zu erstellen
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        // ViewHolder Pattern für bessere Performance in Listenansichten
         ViewHolder holder;
 
         // Überprüfung, ob ein bestehendes View wiederverwendet werden kann, sonst Inflation des Views
@@ -49,18 +56,28 @@ public class CartItemAdapter extends ArrayAdapter<CartItem> {
         holder.decreaseButton.setOnClickListener(v -> {
             int currentQuantity = currentItem.getQuantity();
             if (currentQuantity > 1) { // Menge verringern, wenn sie größer als 1 ist
-                currentItem.setQuantity(currentQuantity - 1);
-                notifyDataSetChanged(); // Benachrichtigt den Adapter über die Änderung
+                updateItemQuantity(currentItem, currentQuantity - 1);
             }
         });
 
         holder.increaseButton.setOnClickListener(v -> {
             int currentQuantity = currentItem.getQuantity();
-            currentItem.setQuantity(currentQuantity + 1); // Menge erhöhen
-            notifyDataSetChanged(); // Benachrichtigt den Adapter über die Änderung
+            updateItemQuantity(currentItem, currentQuantity + 1); // Menge erhöhen
         });
 
         return convertView; // Rückgabe der fertigen Ansicht
+    }
+
+    // Aktualisiert die Menge eines CartItems sowohl im Adapter als auch in der Firebase-Datenbank
+    private void updateItemQuantity(CartItem item, int newQuantity) {
+        item.setQuantity(newQuantity);
+        notifyDataSetChanged(); // Benachrichtigt den Adapter über die Änderung
+        // Aktualisiert die Datenbank mit der neuen Menge
+        databaseReference.child("users")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("cart")
+                .child(item.getName())
+                .setValue(newQuantity);
     }
 
     // ViewHolder Klasse hilft bei der besseren Performance durch das Caching der View-Elemente

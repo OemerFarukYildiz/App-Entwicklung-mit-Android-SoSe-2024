@@ -75,7 +75,7 @@ public class warenkorb extends AppCompatActivity {
         DatabaseReference cartRef = databaseReference.child("users").child(currentUser.getUid()).child("cart");
         cartRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {    // https://stackoverflow.com/questions/70941832/ondatachange-method-is-never-reached
                 ArrayList<CartItem> items = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String item = snapshot.getKey();
@@ -100,8 +100,8 @@ public class warenkorb extends AppCompatActivity {
         DatabaseReference userCartRef = databaseReference.child("users").child(currentUser.getUid()).child("cart");
         userCartRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                HashMap<String, Integer> orderDetails = new HashMap<>();
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {     //https://stackoverflow.com/questions/48786209/how-do-i-put-datasnapshot-into-a-hashmap-and-iterate-firebase-android
+                HashMap<String, Integer> orderDetails = new HashMap<>();       // Damit product und quantity schnell zugeordnet werden
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String product = snapshot.getKey();
                     Integer quantity = snapshot.getValue(Integer.class);

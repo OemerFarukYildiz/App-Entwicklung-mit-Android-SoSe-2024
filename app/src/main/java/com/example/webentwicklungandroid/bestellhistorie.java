@@ -57,7 +57,7 @@ public class bestellhistorie extends AppCompatActivity {
         DatabaseReference ordersRef = databaseReference.child("orders").child(currentUser.getUid());
         ordersRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {   // https://stackoverflow.com/questions/47487817/list-retrieving-from-firebase/47487941#47487941
                 ArrayList<String> orders = new ArrayList<>();
                 // Iteriert über alle Bestellungen
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {

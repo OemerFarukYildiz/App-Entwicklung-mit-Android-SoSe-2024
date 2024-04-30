@@ -32,7 +32,7 @@ public class CartItemAdapter extends ArrayAdapter<CartItem> {
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         ViewHolder holder;
 
-        // Überprüfung, ob ein bestehendes View wiederverwendet werden kann, sonst Inflation des Views
+        // Überprüfung, ob ein bestehendes View wiederverwendet werden kann, sonst Inflation des Views     // https://stackoverflow.com/questions/25381435/unconditional-layout-inflation-from-view-adapter-should-use-view-holder-patter
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_warenkorb, parent, false);
             holder = new ViewHolder();

@@ -62,7 +62,7 @@ public class login extends AppCompatActivity {
         buttonLogin.setOnClickListener(view -> attemptLogin());
     }
 
-    // Führt den Login-Vorgang aus
+    // Führt den Login-Vorgang aus Firebase Bibliothek
     private void attemptLogin() {
         String email = editTextEmail.getText().toString().trim(); // E-Mail aus dem Eingabefeld holen
         String password = editTextPassword.getText().toString().trim(); // Passwort aus dem Eingabefeld holen
@@ -85,7 +85,7 @@ public class login extends AppCompatActivity {
     }
 
     // Navigiert zur Hauptaktivität
-    private void navigateToMainActivity() {
+    private void navigateToMainActivity() { 
         startActivity(new Intent(this, MainActivity.class));
         finish(); // Beendet die aktuelle Activity
     }
